@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref, reactive } from 'vue'
+import { computed, ref } from 'vue'
 import { IToast } from '../types'
 
 export const useCounterStore = defineStore('counter', () => {
@@ -29,19 +29,19 @@ export const useLoadingStore = defineStore('loading', () => {
 })
 
 export const useToastsStore = defineStore('toasts', () => {
-  const toasts = reactive<IToast[]>([])
+  const toasts = ref<IToast[]>([])
 
   function addToast(message: string, type?: 'success' | 'error') {
-    toasts.push({ toastId: message, message, type: type ?? 'success' })
+    toasts.value.push({ toastId: message, message, type: type ?? 'success' })
   }
 
   function removeToast(toastId: string) {
-    toasts.splice(
-      toasts.findIndex(toast => toast.toastId === toastId),
+    toasts.value.splice(
+      toasts.value.findIndex(toast => toast.toastId === toastId),
       1,
     )
   }
 
-  const firstToast = computed(() => toasts[0])
-  return { firstToast, addToast, removeToast }
+  const firstToast = computed(() => toasts.value[0])
+  return { toasts, firstToast, addToast, removeToast }
 })
