@@ -17,7 +17,7 @@ const loadingStore = useLoadingStore()
   right: 8px;
   padding: 0em 2em;
   backdrop-filter: blur(10px);
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(6, 9, 169, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
