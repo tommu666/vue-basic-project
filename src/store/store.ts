@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { IToast } from '../types'
+import uniqid from 'uniqid'
 
 export const useCounterStore = defineStore('counter', () => {
   const count = ref(0)
   const doubleCount = computed(() => count.value * 2)
+
   function increment() {
     count.value++
   }
@@ -32,7 +34,7 @@ export const useToastsStore = defineStore('toasts', () => {
   const toasts = ref<IToast[]>([])
 
   function addToast(message: string, type?: 'success' | 'error') {
-    toasts.value.push({ toastId: message, message, type: type ?? 'success' })
+    toasts.value.push({ toastId: uniqid(), message, type: type ?? 'success' })
   }
 
   function removeToast(toastId: string) {
