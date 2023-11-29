@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import LoadingToast from './components/LoadingToast.vue'
-import ToastsDisplayer from './components/ToastsDisplayer.vue'
-import TopMenu from './components/TopMenu.vue'
-import LanguageSelector from './components/LanguageSelector.vue'
+import ApiDisplayer from '../components/ApiDisplayer.vue'
 </script>
 
 <template>
   <div id="app-container">
-    <TopMenu />
-    <LanguageSelector />
-    <LoadingToast />
-    <ToastsDisplayer />
-    <router-view />
+    <ApiDisplayer />
   </div>
 </template>
 
