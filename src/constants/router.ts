@@ -7,7 +7,7 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/home',
+      path: '/',
       name: 'Home',
       component: HomePage,
     },
@@ -20,7 +20,7 @@ const router = createRouter({
       path: '/forbidden',
       name: 'Forbidden',
       component: ForbiddenPage,
-      beforeEnter: (to, from) => {
+      beforeEnter: (_to, from) => {
         if (from.name === 'Home') return true
         return false
       },
