@@ -7,17 +7,20 @@ const router = useRouter()
 
 <template>
   <div id="menu-container">
-    <Button raised severity="secondary" @click="router.push({ name: 'Home' })" v-if="route.name !== 'Home'">
-      Home
-    </Button>
-    <Button raised severity="secondary" @click="router.push({ name: 'Api' })" v-if="route.name !== 'Api'"> API </Button>
-    <Button raised severity="secondary" @click="router.push({ name: 'Forbidden' })" v-if="route.name !== 'Forbidden'">
-      Forbidden
-    </Button>
+    <button :class="route.name === 'Home' ? 'selected' : ''" @click="router.push({ name: 'Home' })">Home</button>
+    <button :class="route.name === 'Api' ? 'selected' : ''" @click="router.push({ name: 'Api' })">API</button>
+    <button :class="route.name === 'Forbidden' ? 'selected' : ''" @click="router.push({ name: 'Forbidden' })">
+      {{ route.name === 'Api' ? 'Forbidden' : 'Secret' }}
+    </button>
   </div>
 </template>
 
 <style scoped>
+.selected {
+  background-color: #ff6464;
+  color: #fff;
+}
+
 #menu-container {
   display: flex;
   flex-direction: row;
