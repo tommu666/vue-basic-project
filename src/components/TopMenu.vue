@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
+import { useLogout } from '../composables/userComposables'
 
 const route = useRoute()
 const router = useRouter()
+const { logout } = useLogout()
 </script>
 
 <template>
@@ -12,6 +14,7 @@ const router = useRouter()
     <button :class="route.name === 'Forbidden' ? 'selected' : ''" @click="router.push({ name: 'Forbidden' })">
       {{ route.name === 'Api' ? 'Forbidden' : 'Secret' }}
     </button>
+    <button @click="logout">Logout</button>
   </div>
 </template>
 

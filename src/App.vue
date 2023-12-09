@@ -3,15 +3,24 @@ import LoadingToast from './components/LoadingToast.vue'
 import ToastsDisplayer from './components/ToastsDisplayer.vue'
 import TopMenu from './components/TopMenu.vue'
 import LanguageSelector from './components/LanguageSelector.vue'
+import { useAutoLogin } from './composables/userComposables'
+import LoginPage from './components/LoginPage.vue'
+import { useAuthStore } from './store/store'
+
+useAutoLogin()
+const authStore = useAuthStore()
 </script>
 
 <template>
   <div id="app-container">
-    <TopMenu />
     <LanguageSelector />
     <LoadingToast />
     <ToastsDisplayer />
-    <router-view />
+    <template v-if="authStore.isLogged">
+      <TopMenu />
+      <router-view />
+    </template>
+    <LoginPage v-else />
   </div>
 </template>
 

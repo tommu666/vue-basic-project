@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { IToast } from '../types'
+import { IToast, tUser } from '../types'
 import uniqid from 'uniqid'
 
 export const useCounterStore = defineStore('counter', () => {
@@ -46,4 +46,16 @@ export const useToastsStore = defineStore('toasts', () => {
 
   const firstToast = computed(() => toasts.value[0])
   return { toasts, firstToast, addToast, removeToast }
+})
+
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref<tUser | null>(null)
+
+  function setUser(newUser: tUser | null) {
+    user.value = newUser
+  }
+
+  const isLogged = computed(() => user.value !== null)
+
+  return { user, setUser, isLogged }
 })
