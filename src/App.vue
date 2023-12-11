@@ -4,7 +4,7 @@ import ToastsDisplayer from './components/ToastsDisplayer.vue'
 import TopMenu from './components/TopMenu.vue'
 import LanguageSelector from './components/LanguageSelector.vue'
 import { useAutoLogin } from './composables/userComposables'
-import LoginPage from './components/LoginPage.vue'
+import LoginPage from './pages/LoginPage.vue'
 import { useAuthStore } from './store/store'
 
 useAutoLogin()
