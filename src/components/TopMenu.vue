@@ -14,6 +14,7 @@ const { logout } = useLogout()
     <button :class="route.name === 'ShoppingList' ? 'selected' : ''" @click="router.push({ name: 'ShoppingList' })">
       ShoppingList
     </button>
+    <button :class="route.name === 'Images' ? 'selected' : ''" @click="router.push({ name: 'Images' })">Images</button>
     <button :class="route.name === 'Forbidden' ? 'selected' : ''" @click="router.push({ name: 'Forbidden' })">
       {{ route.name === 'Api' ? 'Forbidden' : 'Secret' }}
     </button>

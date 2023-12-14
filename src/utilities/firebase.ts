@@ -25,11 +25,13 @@ import {
   createUserWithEmailAndPassword,
 } from 'firebase/auth'
 import { firebaseConfig } from '../constants/firebaseConfigs'
+import { getDownloadURL, getStorage, ref } from 'firebase/storage'
 
 const firebaseApp = initializeApp(firebaseConfig)
 const db = getFirestore(firebaseApp)
 const provider = new GoogleAuthProvider()
 const functions = getFunctions(firebaseApp, 'europe-west6')
+const storage = getStorage(firebaseApp, 'gs://black-academy.appspot.com')
 
 export const userSignOut = () => {
   const auth = getAuth()
@@ -161,4 +163,10 @@ export const callFirebaseFunction = async ({ functionName, data }: { functionNam
   const firebaseFunction = httpsCallable(functions, functionName)
   const response = await firebaseFunction(data)
   return response
+}
+
+export const getStorageUrl = async ({ path }: { path: string }) => {
+  const storageRef = ref(storage, path)
+  const url = await getDownloadURL(storageRef)
+  return url
 }
