@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { getStorageUrl } from '../utilities/firebase'
+import { onMounted } from 'vue'
 
 const imagesList = ['01', '02', '03']
 const selectedImageIndex = ref(0)
@@ -19,9 +20,14 @@ const selectPrevious = () => {
 }
 
 const getImageUrl = async (image: string) => {
+  selectedImageUrl.value = ''
   const url = await getStorageUrl({ path: `examples/${image}.png` })
   selectedImageUrl.value = url
 }
+
+onMounted(() => {
+  getImageUrl(imagesList[selectedImageIndex.value])
+})
 </script>
 
 <template>
