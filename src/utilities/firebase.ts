@@ -11,6 +11,13 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  query,
+  where,
+  WhereFilterOp,
+  limit,
+  startAt,
+  orderBy,
+  onSnapshot,
 } from 'firebase/firestore'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import {
@@ -80,6 +87,53 @@ export const getCollection = async ({ collectionId }: { collectionId: string }) 
   return querySnapshot.docs.map(doc => doc.data())
 }
 
+export const getCollectionWithQueries = async ({
+  collectionId,
+  queries,
+  page,
+  pageSize,
+  orderFields,
+}: {
+  collectionId: string
+  queries: { key: string; operator: string; value: string | string[] | boolean | null }[]
+  page?: number
+  pageSize?: number
+  orderFields?: string[]
+}) => {
+  const q = query(
+    collection(db, collectionId),
+    ...queries.map(({ key, operator, value }) => where(key, operator as WhereFilterOp, value)),
+    ...(pageSize ? [limit(10)] : []),
+    ...(page && page > 0 && pageSize ? [startAt(page * pageSize)] : []),
+    ...(orderFields?.length ? orderFields.map(field => orderBy(field)) : []),
+  )
+
+  const querySnapshot = await getDocs(q)
+  return querySnapshot.docs.map(doc => doc.data())
+}
+
+export const setCollectionWatcherWithQueries = ({
+  collectionId,
+  queries,
+  setChanges,
+}: {
+  collectionId: string
+  queries: { key: string; operator: string; value: string | string[] | boolean | null }[]
+  setChanges: (changes: any) => void
+}) => {
+  const q = query(
+    collection(db, collectionId),
+    ...queries.map(({ key, operator, value }) => where(key, operator as WhereFilterOp, value)),
+  )
+  return onSnapshot(q, response => {
+    const changes = response.docs.reduce((list, doc) => {
+      const data = doc.data()
+      return { ...list, [doc.id]: data }
+    }, {})
+    setChanges(changes)
+  })
+}
+
 export const getCollectionDoc = async ({ collectionId, docId }: { collectionId: string; docId: string }) => {
   const docRef = doc(db, collectionId, docId)
   const docSnap = await getDoc(docRef)
@@ -119,8 +173,8 @@ export const addCollectionDoc = async ({
   await updateDoc(docRef, { [idName]: docId })
 
   return {
-    [idName]: docId,
     ...data,
+    [idName]: docId,
   }
 }
 

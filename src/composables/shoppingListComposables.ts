@@ -1,83 +1,85 @@
-import { ref, onMounted } from 'vue'
-import { getCollectionDoc, setCollectionDoc, updateCollectionDoc } from '../utilities/firebase'
+import { ref, onMounted, computed } from 'vue'
+import { addCollectionDoc, setCollectionWatcherWithQueries, updateCollectionDoc } from '../utilities/firebase'
 import { useCall } from './useCall'
 import { firestoreCollections } from '../constants/firebaseConfigs'
 import { useAuthStore } from '../store/store'
 import { formatNewShoppingList, formatNewShoppingListItem, tShoppingListDoc, tShoppingListItem } from '../types'
+import { DocumentData } from 'firebase/firestore'
 
 export const useShoppingList = () => {
   const authStore = useAuthStore()
-  const shoppingList = ref<tShoppingListItem[]>([])
+  const shoppingLists = ref<Record<string, tShoppingListDoc>>({})
+  const shoppingListId = ref<string>('')
+  const shoppingList = computed(() => shoppingLists.value[shoppingListId.value]?.list || [])
   const { call } = useCall()
 
-  const createShoppingList = () =>
-    call(async function createShoppingList() {
-      if (!authStore.user?.userId) return
-      const newShoppingListDoc = formatNewShoppingList(authStore.user.userId)
-      await setCollectionDoc({
-        collectionId: firestoreCollections.shoppingList,
-        docId: authStore.user?.userId,
-        data: newShoppingListDoc,
-      })
-      shoppingList.value = newShoppingListDoc.list
+  const addShoppingList = async () => {
+    if (!authStore.user?.userId) return
+    const newShoppingList = formatNewShoppingList(authStore.user.userId)
+    const response = await addCollectionDoc({
+      collectionId: firestoreCollections.shoppingList,
+      data: newShoppingList,
+      idName: 'shoppingListId',
     })
-
-  const fetchShoppingList = () =>
-    call(async function fetchShoppingList() {
-      if (!authStore.user?.userId) return
-      const response = (await getCollectionDoc({
-        collectionId: firestoreCollections.shoppingList,
-        docId: authStore.user?.userId,
-      })) as tShoppingListDoc
-      if (!response.userId) createShoppingList()
-      else shoppingList.value = response.list
-    })
+    shoppingListId.value = response.shoppingListId
+  }
 
   const addItem = () =>
     call(async function addItem() {
       const item = formatNewShoppingListItem()
-      shoppingList.value.push(item)
+      const newList = [...shoppingList.value, item]
       await updateCollectionDoc({
         collectionId: firestoreCollections.shoppingList,
-        docId: authStore.user!.userId,
-        data: { list: shoppingList.value },
+        docId: shoppingListId.value,
+        data: { list: newList },
       })
     })
 
   const removeItem = (id: string) =>
     call(async function removeItem() {
-      shoppingList.value = shoppingList.value.filter(item => item.id !== id)
+      const newList = shoppingList.value.filter(item => item.id !== id)
       await updateCollectionDoc({
         collectionId: firestoreCollections.shoppingList,
-        docId: authStore.user!.userId,
-        data: { list: shoppingList.value },
+        docId: shoppingListId.value,
+        data: { list: newList },
       })
     })
 
   const editItem = (id: string, data: Partial<tShoppingListItem>) =>
     call(async function editItem() {
-      console.log('editing item', id, data)
-      const index = shoppingList.value.findIndex(item => item.id === id)
-      shoppingList.value[index] = { ...shoppingList.value[index], ...data }
-    })
-
-  const saveShoppingList = () =>
-    call(async function saveShoppingList() {
-      await updateCollectionDoc({
+      updateCollectionDoc({
         collectionId: firestoreCollections.shoppingList,
-        docId: authStore.user!.userId,
-        data: { list: shoppingList.value },
+        docId: shoppingListId.value,
+        data: { list: shoppingList.value.map(item => (item.id === id ? { ...item, ...data } : item)) },
       })
     })
 
-  onMounted(fetchShoppingList)
+  const fetchShoppingLists = () =>
+    call(async function fetchShoppingLists() {
+      if (!authStore.user?.userId) return
+      setCollectionWatcherWithQueries({
+        collectionId: firestoreCollections.shoppingList,
+        queries: [{ key: 'userId', operator: '==', value: authStore.user.userId }],
+        setChanges: (changes: Record<string, DocumentData>) => {
+          shoppingLists.value = changes as Record<string, tShoppingListDoc>
+        },
+      })
+    })
+
+  const setShoppingListId = (id: string) => {
+    shoppingListId.value = id
+  }
+
+  onMounted(fetchShoppingLists)
 
   return {
+    shoppingLists,
     shoppingList,
-    fetchShoppingList,
     addItem,
     removeItem,
     editItem,
-    saveShoppingList,
+    shoppingListId,
+    setShoppingListId,
+    addShoppingList,
   }
 }

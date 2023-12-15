@@ -3,6 +3,7 @@ import uniqid from 'uniqid'
 export type tShoppingListDoc = {
   list: tShoppingListItem[]
   userId: string
+  shoppingListId: string
 }
 
 export type tShoppingListItem = {
@@ -16,6 +17,7 @@ export type tShoppingListItem = {
 export const formatNewShoppingList = (userId: string): tShoppingListDoc => ({
   userId,
   list: [],
+  shoppingListId: uniqid(),
 })
 
 export const formatNewShoppingListItem = (): tShoppingListItem => ({

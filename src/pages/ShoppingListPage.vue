@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { useShoppingList } from '../composables/shoppingListComposables'
 
-const { shoppingList, addItem, removeItem, editItem, saveShoppingList } = useShoppingList()
+const { shoppingLists, shoppingList, addItem, removeItem, editItem, shoppingListId, addShoppingList } =
+  useShoppingList()
 </script>
 
 <template>
   <div>
     <h1>Shopping list</h1>
+    <select v-model="shoppingListId">
+      <option v-for="list in shoppingLists" :key="list.shoppingListId" :value="list.shoppingListId">
+        {{ list.shoppingListId }}
+      </option>
+    </select>
     <div class="list">
       <div class="list-item" v-for="item in shoppingList" :key="item.id">
         <input
@@ -18,8 +24,8 @@ const { shoppingList, addItem, removeItem, editItem, saveShoppingList } = useSho
       </div>
     </div>
     <div class="bottom-bar">
-      <Button @click="addItem">+</Button>
-      <Button @click="saveShoppingList">SAVE</Button>
+      <Button @click="addItem" :disabled="!shoppingListId">Add item</Button>
+      <Button @click="addShoppingList">Add shopping list</Button>
     </div>
   </div>
 </template>
@@ -29,18 +35,20 @@ const { shoppingList, addItem, removeItem, editItem, saveShoppingList } = useSho
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
+  padding: 10px;
 }
 
 .list-item {
   display: flex;
   justify-content: space-between;
   width: 200px;
-  margin-bottom: 10px;
 }
 
 .bottom-bar {
   display: flex;
   justify-content: space-between;
   width: 200px;
+  margin-top: 10px;
 }
 </style>
